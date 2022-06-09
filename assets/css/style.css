@@ -62,6 +62,7 @@ header {
 }
 .result {
     font-size: small;
+    color: rgba(0,0,0, 0.2);
 }
 
 .btn {
