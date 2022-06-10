@@ -1,9 +1,10 @@
 // GLOBALS
 //Counter to distinguish which quiz questions we are on.
+var answerIdCounter = 0;
 var quizIdCounter = 0;
 var rightAnsInd = 0;
 var wrongAnsIndex = 0;
-
+var finish = false;
 var time = 0;
 // Variable for the event listener in main
 var pageContentEl = document.querySelector("#page-content");
@@ -11,7 +12,7 @@ var pageContentEl = document.querySelector("#page-content");
 var startBtnEl = window.document.querySelector("#start-quiz");
 //variable to listen to events in header
 
-var headerEl = document.querySelector("header");
+var headerButtonEl = document.querySelector("#scoreBtn");
 var resultSectionEl = document.querySelector("#result-section");
 var resultTextEl = document.querySelector("#result-text");
 
@@ -76,10 +77,9 @@ function createMutlipleButtons(index, array,rightOrWrong){
     }
     else if(!rightOrWrong){
         listButtonEl.id = "question-wrong";
-        listButtonEl.setAttribute("ans-id",quizIdCounter);
-        quizIdCounter++;
+        listButtonEl.setAttribute("ans-id",answerIdCounter);
+        answerIdCounter++;
     }
-   console.log(listButtonEl);
  
     listChoiceEl.appendChild(listButtonEl);
     quizQuestionsEl.appendChild(listChoiceEl);
@@ -90,97 +90,160 @@ function replaceAnswers(index, array,rightOrWrong,buttonId){
 
     
     if(rightOrWrong){
-        console.log("Replacing right button texts...");
+       
         var listButtonEl = document.querySelector("#question-right");
         listButtonEl.textContent = array[index]; 
-        console.log(listButtonEl);
+        
     }
     else if (!rightOrWrong){
-        console.log("Replacing wrong button at id: " + buttonId);
+        
         var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
-        console.log(listButtonEl);
+        
         listButtonEl.textContent = array[index]; 
     }
 
 }
 
-function createNewQuestion(index,resultTextEl) {
-       //Change questions
-   document.querySelector("#prompt").textContent = questionObj.questions[index];
-    
+function createNewQuestion(index) {
+
+    //Change questions
+  var questionEl = document.querySelector("#prompt");
+  //replace the content of the question with the next prompt in the array of questionObj
+  questionEl.textContent = questionObj.questions[index];
+  //Create individual Id's for reach question
+  questionEl.setAttribute("question-id",quizIdCounter);
+  
+  quizIdCounter++;
+ 
+  
+
 }
 
-function removeText(textToRemove) {
-    textToRemove.remove();
-}
+function removeAnswers(index,rightOrWrong, buttonId){
 
+    if(rightOrWrong){
+        
+        var listButtonEl = document.querySelector("#question-right");
+        listButtonEl.remove();
+        
+    }
+    else if (!rightOrWrong){
+        
+        var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
+        
+        listButtonEl.remove();
+    }
+
+}
+function timerCount() {
+    time++;
+    document.querySelector("#shown-timer").textContent = "Time: " + time;
+};
+function checkEnd(targetEl){
+    if(quizIdCounter == 5){
+        if(targetEl.matches("#question-right")){
+            scoreObj.percentage++;
+        }
+        finish = true;
+    }
+}
 // function to deal with buttons in main
 function quizButtonHandler(event){
   var targetEl = event.target; 
   var right = true;
   var wrong = false;
   
-  console.log(rightAnsInd);
-  if(targetEl.matches("#start-quiz")){
+  
+  if(!finish){
+  
+    if(targetEl.matches("#start-quiz")){
 
-   //**********start timer here*************
-   //every one second, increase our time to act as a timer.
-    // setInterval(function() {
-    //     time++;
-    //     console.log(time);
-    // }, 1000);
-    // remove start prompt
-    document.querySelector("#startExcerpt").remove();
+        //**********start timer here*************
+        //every one second, increase our time to act as a timer.
+        scoreObj.time = setInterval(timerCount, 1000);
+        // remove start prompt
+        document.querySelector("#startExcerpt").remove();
 
-    //remove start button
-    startBtnEl.remove();
-     
-    createNewQuestion(rightAnsInd,resultTextEl);
-    createMutlipleButtons(rightAnsInd, questionObj.correctAns,right);
-    rightAnsInd++;
-    //use a for loop to create 3 wrong answers
-   
-    for(wrongAnsIndex; wrongAnsIndex < questionObj.questions.length-2; wrongAnsIndex++){
-        createMutlipleButtons(wrongAnsIndex, questionObj.wrongAns,wrong);
-     
-    }
-    console.log(wrongAnsIndex);
-    
-    }
-    else if(targetEl.matches("#question-right")){
-       
-
-        resultTextEl.textContent = "Correct!";
-
-        resultSectionEl.appendChild(resultTextEl);
-
-        console.log("have clicked a right answer");
+        //remove start button
+        startBtnEl.remove();
         
-      
-        //Next Question
-        replaceAnswers(rightAnsInd, questionObj.correctAns,right);
+        createNewQuestion(rightAnsInd);
+        createMutlipleButtons(rightAnsInd, questionObj.correctAns,right);
         rightAnsInd++;
-        var newLimit = wrongAnsIndex+3;
-        var buttonId = 0;
-        console.log(wrongAnsIndex);
-        for( wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
-            console.log("entering replace wrong answers for loop...");
-            replaceAnswers(wrongAnsIndex, questionObj.wrongAns,wrong,buttonId);  
-            console.log(questionObj.wrongAns[wrongAnsIndex]);
-            buttonId++;
-        }
-        
-
+        //use a for loop to create 3 wrong answers
+    
+        for(wrongAnsIndex; wrongAnsIndex < questionObj.questions.length-2; wrongAnsIndex++){
+            createMutlipleButtons(wrongAnsIndex, questionObj.wrongAns,wrong);
+        }        
     }
-    else if(targetEl.matches("#question-wrong")){
-        console.log(targetEl)
-     
-        resultTextEl.textContent = "Incorrect!"
-       
-        resultSectionEl.appendChild(resultTextEl);
-        console.log("have clicked a wrong answer");
+        else if(targetEl.matches("#question-right")){
+        
+            scoreObj.percentage++;
+            console.log(scoreObj.percentage);
+            resultTextEl.textContent = "Correct!";
 
-        //Next Question
+            resultSectionEl.appendChild(resultTextEl);
+
+            console.log("have clicked a right answer");
+            
+        
+            //Next Question
+            createNewQuestion(rightAnsInd);
+            replaceAnswers(rightAnsInd, questionObj.correctAns,right);
+            rightAnsInd++;
+            var newLimit = wrongAnsIndex+3;
+            var buttonId = 0;
+           
+            for( wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
+              
+                replaceAnswers(wrongAnsIndex, questionObj.wrongAns,wrong,buttonId);  
+                
+                buttonId++;
+            }
+            checkEnd(targetEl);
+
+        }
+        else if(targetEl.matches("#question-wrong")){
+            
+            time--;
+            resultTextEl.textContent = "Incorrect!"
+        
+            resultSectionEl.appendChild(resultTextEl);
+            console.log("have clicked a wrong answer");
+
+            //Next Question
+                    //Next Question
+                    createNewQuestion(rightAnsInd);
+                    replaceAnswers(rightAnsInd, questionObj.correctAns,right);
+                    rightAnsInd++;
+                    var newLimit = wrongAnsIndex+3;
+                    var buttonId = 0;
+                  
+                    for( wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
+                      
+                        replaceAnswers(wrongAnsIndex, questionObj.wrongAns,wrong,buttonId);  
+                        console.log(questionObj.wrongAns[wrongAnsIndex]);
+                        buttonId++;
+                    }
+                    checkEnd(targetEl);
+        }
+    }
+    else {
+        //Finished game, remove our buttons and questions, display score.
+        clearInterval(scoreObj.time);
+        console.log("You finished in " + time + " seconds");
+        document.querySelector("#prompt").textContent = "You finished! Here are your stats:";
+        resultSectionEl.remove();
+        removeAnswers(rightAnsInd, right);
+        for( i = 0; i< 3; i++) {
+           
+            removeAnswers(wrongAnsIndex, wrong,i);           
+        }
+        var finalScoreEl = document.createElement("h2");
+        var questionSectionEl = document.querySelector(".quiz-questions-wrapper");
+        finalScoreEl.className = "finalScore";
+        finalScoreEl.textContent = "You answered " + scoreObj.percentage + "/" +questionObj.questions.length + " correctly.";
+        questionSectionEl.appendChild(finalScoreEl);
     }
 };
 
@@ -190,7 +253,7 @@ function headerButtonHandler(event){
 };
 
 pageContentEl.addEventListener("click",quizButtonHandler);
-headerEl.addEventListener("click",headerButtonHandler);
+headerButtonEl.addEventListener("click",headerButtonHandler);
 console.dir(startBtnEl);
 
 
