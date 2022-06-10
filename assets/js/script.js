@@ -5,7 +5,8 @@ var quizIdCounter = 0;
 var rightAnsInd = 0;
 var wrongAnsIndex = 0;
 var finish = false;
-var time = 0;
+
+
 // Variable for the event listener in main
 var pageContentEl = document.querySelector("#page-content");
 
@@ -20,8 +21,9 @@ var resultTextEl = document.querySelector("#result-text");
 var quizQuestionsEl = document.querySelector("#questions-list");
 //object to store into localStorage at the end of each quiz
 var scoreObj = {
-    time : 0,
-    percentage: 0
+    timeFunct : 0,
+    percentage: 0,
+    time : 0
 };
 var questionObj = {
     questions: [
@@ -136,8 +138,8 @@ function removeAnswers(index,rightOrWrong, buttonId){
 
 }
 function timerCount() {
-    time++;
-    document.querySelector("#shown-timer").textContent = "Time: " + time;
+    scoreObj.time++;
+    document.querySelector("#shown-timer").textContent = "Time: " + scoreObj.time;
 };
 function checkEnd(targetEl){
     if(quizIdCounter == 5){
@@ -160,7 +162,7 @@ function quizButtonHandler(event){
 
         //**********start timer here*************
         //every one second, increase our time to act as a timer.
-        scoreObj.time = setInterval(timerCount, 1000);
+        scoreObj.timeFunct = setInterval(timerCount, 1000);
         // remove start prompt
         document.querySelector("#startExcerpt").remove();
 
@@ -205,7 +207,7 @@ function quizButtonHandler(event){
         }
         else if(targetEl.matches("#question-wrong")){
             
-            time--;
+            scoreObj.time--;
             resultTextEl.textContent = "Incorrect!"
         
             resultSectionEl.appendChild(resultTextEl);
@@ -230,8 +232,9 @@ function quizButtonHandler(event){
     }
     else {
         //Finished game, remove our buttons and questions, display score.
-        clearInterval(scoreObj.time);
-        console.log("You finished in " + time + " seconds");
+        clearInterval(scoreObj.timeFunct);
+        saveScore();
+        console.log("You finished in " + scoreObj.time + " seconds");
         document.querySelector("#prompt").textContent = "You finished! Here are your stats:";
         resultSectionEl.remove();
         removeAnswers(rightAnsInd, right);
@@ -250,6 +253,23 @@ function quizButtonHandler(event){
 //function to deal with buttons in header
 function headerButtonHandler(event){
     alert("high score button clicked");
+};
+function saveScore() { 
+    var highScoreLocal = localStorage.getItem("score");
+    if(highScoreLocal < scoreObj.percentage){
+        localStorage.setItem("score", (scoreObj.percentage));
+        localStorage.setItem("time", scoreObj.time);
+        window.alert("You beat the highscore!");
+    }
+    else if(highScoreLocal == 0){
+        localStorage.setItem("score", (scoreObj.percentage));
+        localStorage.setItem("time", scoreObj.time);
+        
+    }
+    else {
+        window.alert("You did not beat the high score!");
+    }
+    
 };
 
 pageContentEl.addEventListener("click",quizButtonHandler);
