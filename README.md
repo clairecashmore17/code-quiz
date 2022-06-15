@@ -19,4 +19,4 @@ THEN I can save my initials and score
 <h2> Screen Capture of my quiz </h2>
 <img src="./assets/imgs/screenCap.png" /> 
 
-Deplyoment: 
+Deplyoment: https://clairecashmore17.github.io/code-quiz/
