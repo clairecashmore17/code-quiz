@@ -29,7 +29,7 @@ var quizQuestionsEl = document.querySelector("#questions-list");
 var scoreObj = {
     timeFunct: 0,
     percentage: 0,
-    time: 0,
+    time: 10,
     name: ""
 
 };
@@ -171,12 +171,22 @@ function removeAnswers(index, rightOrWrong, buttonId) {
 }
 //Function to add time to our counter
 function timerCount() {
-    scoreObj.time++;
+    scoreObj.time--;
     //updates our time on page with every iteration
-    document.querySelector("#shown-timer").textContent = "Time: " + scoreObj.time;
+    if( scoreObj.time >= 0){
+        document.querySelector("#shown-timer").textContent = "Time: " + scoreObj.time;
+    }
+    else if (scoreObj.time < 0){
+        clearInterval(scoreObj.timeFunct);
+        document.querySelector("#shown-timer").textContent = "Time: " + scoreObj.time + " You ran out of time!";
+    }
+    checkEnd();
 }
 //Function to check if we have reached the end of our questions
 function checkEnd(targetEl) {
+    if(scoreObj.time == 0){
+        finish = true;
+    }
     if (quizIdCounter == 5) {
         //if the last thing the user put in was a right answer, add to the score
         if (targetEl.matches("#question-right")) {
@@ -192,7 +202,7 @@ function quizButtonHandler(event) {
     var wrong = false;
 
     // continue until we have finished the quiz
-    if (!finish) {
+    if (!finish || scoreObj.time > 0) {
         // if our click matches the start button...
         if (targetEl.matches("#start-quiz")) {
 
@@ -244,7 +254,7 @@ function quizButtonHandler(event) {
         //evaluate if the answer clicked was wrong
         else if (targetEl.matches("#question-wrong")) {
             //take away a second and let user know they were wrong
-            scoreObj.time--;
+            scoreObj.time-= 5;
             resultTextEl.textContent = "Incorrect!"
 
             resultSectionEl.appendChild(resultTextEl);
