@@ -17,6 +17,6 @@ WHEN the game is over
 THEN I can save my initials and score
 </p>
 <h2> Screen Capture of my quiz </h2>
-<img src="./assets/imgs/screencap.jpg" /> 
+<img src="./assets/imgs/screenCap.png" /> 
 
 Deplyoment: 
