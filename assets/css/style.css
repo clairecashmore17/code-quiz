@@ -98,7 +98,16 @@ header {
     box-shadow: 0 0px var(--grey);
     top: 0;
 }
-
+/*Header Page*/
+.scoreList {
+    display: flex;
+    flex-direction: column;
+}
+.score {
+    list-style: disc; 
+    background-color: bisque;
+    margin: 5px;
+}
 footer {
     text-align: center;
     font-size: x-small;
