@@ -29,7 +29,7 @@ var quizQuestionsEl = document.querySelector("#questions-list");
 var scoreObj = {
     timeFunct: 0,
     percentage: 0,
-    time: 10,
+    time: 30,
     name: ""
 
 };
