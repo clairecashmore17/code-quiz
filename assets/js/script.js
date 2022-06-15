@@ -22,15 +22,15 @@ var questionEl = document.querySelector("#prompt");
 var quizQuestionsEl = document.querySelector("#questions-list");
 //object to store into localStorage at the end of each quiz
 var scoreObj = {
-    timeFunct : 0,
+    timeFunct: 0,
     percentage: 0,
-    time : 0,
+    time: 0,
     name: ""
-    
+
 };
 var questionObj = {
     questions: [
-        "What HTML element do we put javascript into?", 
+        "What HTML element do we put javascript into?",
         "What is the correct JavaScript syntax to write 'Hello World'?",
         "Where is the correct place to insert a JavaScript?",
         "How do you create a function?",
@@ -44,7 +44,7 @@ var questionObj = {
         "functionName(parameter);"
 
     ],
-    wrongAns:[
+    wrongAns: [
         "<javascript>",
         "<js>",
         "<scripting>",
@@ -63,65 +63,69 @@ var questionObj = {
     ]
 };
 // function to generate a random numeric value
-var randomNumber = function(min, max) {
+var randomNumber = function (min, max) {
     var value = Math.floor(Math.random() * (max - min) + min);
-  
+
     return value;
-  };
+};
 
 // function to create multiple choice buttons
-function createMutlipleButtons(index, array,rightOrWrong){
+function createMutlipleButtons(index, array, rightOrWrong) {
     var parentUlEl = document.querySelector("ul");
     var listChoiceEl = document.createElement("li");
     var listButtonEl = document.createElement("button");
-    var randomIteration = randomNumber(0,4);
-    listButtonEl.textContent = array[index]; 
+    var randomIteration = randomNumber(0, 4);
+    listButtonEl.textContent = array[index];
     listButtonEl.className = "btn";
     listChoiceEl.className = "question";
-    if(rightOrWrong){
+    //create singular right answer
+    if (rightOrWrong) {
         listButtonEl.id = "question-right";
-        console.log("randomd answer is at index " + randomIteration);
         //Randomly alter flex order.
-        if (randomIteration == 1){
+        if (randomIteration === 1) {
+            console.log("entered first if to set right answer at order 1");
             listChoiceEl.className = "question question-order-1";
         }
-        else if(randomIteration == 2){
+        else if (randomIteration === 2) {
+            console.log("entered second if to set right answer at order 2");
             listChoiceEl.className = "question question-order-1";
-           
+
         }
-        else if(randomIteration == 3){
+        else if (randomIteration === 3) {
+            console.log("entered third if to set right answer at order 3");
             listChoiceEl.className = "question question-order-3";
         }
-        
-        console.dir(listButtonEl);    
+        console.dir(listButtonEl);
     }
-    else if(!rightOrWrong){
+    else if (!rightOrWrong) {
         listButtonEl.id = "question-wrong";
-        listChoiceEl.className = "question question-order-2";
-        listButtonEl.setAttribute("ans-id",answerIdCounter);
+        listChoiceEl.className = "question";
+        listButtonEl.setAttribute("ans-id", answerIdCounter);
         answerIdCounter++;
     }
-    
+
     listChoiceEl.appendChild(listButtonEl);
     quizQuestionsEl.appendChild(listChoiceEl);
-    
-    
+
+
 }
-function replaceAnswers(index, array,rightOrWrong,buttonId){
+function replaceAnswers(index, array, rightOrWrong, buttonId) {
 
-    if(rightOrWrong){
-       
+    var randomIteration = randomNumber(0, 4)
+    //create singular right answer
+    if (rightOrWrong) {
+
         var listButtonEl = document.querySelector("#question-right");
-        listButtonEl.textContent = array[index]; 
-      
-    }
-        
+        listButtonEl.textContent = array[index];
 
-    else if (!rightOrWrong){
-        
+    }
+
+
+    else if (!rightOrWrong) {
+
         var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
-        
-        listButtonEl.textContent = array[index]; 
+
+        listButtonEl.textContent = array[index];
     }
 
 }
@@ -129,30 +133,30 @@ function replaceAnswers(index, array,rightOrWrong,buttonId){
 function createNewQuestion(index) {
 
     //Change questions
- 
-  //replace the content of the question with the next prompt in the array of questionObj
-  questionEl.textContent = questionObj.questions[index];
-  //Create individual Id's for reach question
-  questionEl.setAttribute("question-id",quizIdCounter);
-  
-  quizIdCounter++;
- 
-  
+
+    //replace the content of the question with the next prompt in the array of questionObj
+    questionEl.textContent = questionObj.questions[index];
+    //Create individual Id's for reach question
+    questionEl.setAttribute("question-id", quizIdCounter);
+
+    quizIdCounter++;
+
+
 
 }
 
-function removeAnswers(index,rightOrWrong, buttonId){
+function removeAnswers(index, rightOrWrong, buttonId) {
 
-    if(rightOrWrong){
-        
+    if (rightOrWrong) {
+
         var listButtonEl = document.querySelector("#question-right");
         listButtonEl.remove();
-        
+
     }
-    else if (!rightOrWrong){
-        
+    else if (!rightOrWrong) {
+
         var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
-        
+
         listButtonEl.remove();
     }
 
@@ -161,94 +165,94 @@ function timerCount() {
     scoreObj.time++;
     document.querySelector("#shown-timer").textContent = "Time: " + scoreObj.time;
 };
-function checkEnd(targetEl){
-    if(quizIdCounter == 5){
-        if(targetEl.matches("#question-right")){
+function checkEnd(targetEl) {
+    if (quizIdCounter == 5) {
+        if (targetEl.matches("#question-right")) {
             scoreObj.percentage++;
         }
         finish = true;
     }
 }
 // function to deal with buttons in main
-function quizButtonHandler(event){
-  var targetEl = event.target; 
-  var right = true;
-  var wrong = false;
-  
-  
-  if(!finish){
-  
-    if(targetEl.matches("#start-quiz")){
+function quizButtonHandler(event) {
+    var targetEl = event.target;
+    var right = true;
+    var wrong = false;
 
-        //**********start timer here*************
-        //every one second, increase our time to act as a timer.
-        scoreObj.timeFunct = setInterval(timerCount, 1000);
-        // remove start prompt
-        document.querySelector("#startExcerpt").remove();
 
-        //remove start button
-        startBtnEl.remove();
-        
-        createNewQuestion(rightAnsInd);
-        createMutlipleButtons(rightAnsInd, questionObj.correctAns,right);
-        rightAnsInd++;
-        //use a for loop to create 3 wrong answers
-    
-        for(wrongAnsIndex; wrongAnsIndex < questionObj.questions.length-2; wrongAnsIndex++){
-            createMutlipleButtons(wrongAnsIndex, questionObj.wrongAns,wrong);
-        }        
-    }
-        else if(targetEl.matches("#question-right")){
-        
+    if (!finish) {
+
+        if (targetEl.matches("#start-quiz")) {
+
+            //**********start timer here*************
+            //every one second, increase our time to act as a timer.
+            scoreObj.timeFunct = setInterval(timerCount, 1000);
+            // remove start prompt
+            document.querySelector("#startExcerpt").remove();
+
+            //remove start button
+            startBtnEl.remove();
+
+            createNewQuestion(rightAnsInd);
+            createMutlipleButtons(rightAnsInd, questionObj.correctAns, right);
+            rightAnsInd++;
+            //use a for loop to create 3 wrong answers
+
+            for (wrongAnsIndex; wrongAnsIndex < questionObj.questions.length - 2; wrongAnsIndex++) {
+                createMutlipleButtons(wrongAnsIndex, questionObj.wrongAns, wrong);
+            }
+        }
+        else if (targetEl.matches("#question-right")) {
+
             scoreObj.percentage++;
-            console.log(scoreObj.percentage);
+
             resultTextEl.textContent = "Correct!";
 
             resultSectionEl.appendChild(resultTextEl);
 
             console.log("have clicked a right answer");
-            
+
             // ********NEED TO ADD PAUSE HERE**********/
-        
+
             //Next Question
             createNewQuestion(rightAnsInd);
-            replaceAnswers(rightAnsInd, questionObj.correctAns,right);
+            replaceAnswers(rightAnsInd, questionObj.correctAns, right);
             rightAnsInd++;
-            var newLimit = wrongAnsIndex+3;
+            var newLimit = wrongAnsIndex + 3;
             var buttonId = 0;
-           
-            for( wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
-              
-                replaceAnswers(wrongAnsIndex, questionObj.wrongAns,wrong,buttonId);  
-                
+
+            for (wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
+
+                replaceAnswers(wrongAnsIndex, questionObj.wrongAns, wrong, buttonId);
+
                 buttonId++;
             }
             checkEnd(targetEl);
 
         }
-        else if(targetEl.matches("#question-wrong")){
-            
+        else if (targetEl.matches("#question-wrong")) {
+
             scoreObj.time--;
             resultTextEl.textContent = "Incorrect!"
-        
+
             resultSectionEl.appendChild(resultTextEl);
             console.log("have clicked a wrong answer");
 
             //Next Question
-                    //Next Question
-                    createNewQuestion(rightAnsInd);
-                    replaceAnswers(rightAnsInd, questionObj.correctAns,right);
-                    rightAnsInd++;
-                    var newLimit = wrongAnsIndex+3;
-                    var buttonId = 0;
-                  
-                    for( wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
-                      
-                        replaceAnswers(wrongAnsIndex, questionObj.wrongAns,wrong,buttonId);  
-                        console.log(questionObj.wrongAns[wrongAnsIndex]);
-                        buttonId++;
-                    }
-                    checkEnd(targetEl);
+            //Next Question
+            createNewQuestion(rightAnsInd);
+            replaceAnswers(rightAnsInd, questionObj.correctAns, right);
+            rightAnsInd++;
+            var newLimit = wrongAnsIndex + 3;
+            var buttonId = 0;
+
+            for (wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
+
+                replaceAnswers(wrongAnsIndex, questionObj.wrongAns, wrong, buttonId);
+                // console.log(questionObj.wrongAns[wrongAnsIndex]);
+                buttonId++;
+            }
+            checkEnd(targetEl);
         }
     }
     else {
@@ -259,26 +263,26 @@ function quizButtonHandler(event){
         document.querySelector("#prompt").textContent = "You finished! Here are your stats:";
         resultSectionEl.remove();
         removeAnswers(rightAnsInd, right);
-        for( i = 0; i< 3; i++) {
-           
-            removeAnswers(wrongAnsIndex, wrong,i);           
+        for (i = 0; i < 3; i++) {
+
+            removeAnswers(wrongAnsIndex, wrong, i);
         }
         var finalScoreEl = document.createElement("h2");
-        
-        
+
+
 
         var questionSectionEl = document.querySelector(".quiz-questions-wrapper");
         finalScoreEl.className = "finalScore";
-        finalScoreEl.textContent = "You answered " + scoreObj.percentage + "/" +questionObj.questions.length + " correctly.";
+        finalScoreEl.textContent = "You answered " + scoreObj.percentage + "/" + questionObj.questions.length + " correctly.";
         //Ask for users initials
         createSubmitName(questionSectionEl);
-        
+
         questionSectionEl.appendChild(finalScoreEl);
     }
 };
 //Function to create the submit button for name
 function createSubmitName(parentNode) {
-    var nameInput = document.createElement( "input");
+    var nameInput = document.createElement("input");
     var nameSubmit = document.createElement("input");
     nameInput.setAttribute('type', 'text');
     nameInput.id = "name";
@@ -294,32 +298,32 @@ function createSubmitName(parentNode) {
 function saveName() {
     var inputVal = document.getElementById("name").value;
     scoreObj.name = inputVal;
-    
+
 }
 
 //Function to save score to localStorage
-function saveScore() { 
+function saveScore() {
     //Score array score
     //scoreobj with a name. time. and percentage
     //store the scoreobj into a new array each time.
-    
-   
-    
+
+
+
     // if(currentScores === null){
     //     window.alert("You are the first to score!");
-            localStorage.setItem("score", JSON.stringify(scores[0]=scoreObj)); 
+    localStorage.setItem("score", JSON.stringify(scores[0] = scoreObj));
     // }
     // else {
     //     var currentHighScore = currentScores[0];
     //     var listLength = currentScores.length;
     //     console.log(listLength);
     // }
-   
+
 };
 
 //function to deal with buttons in header
-function headerButtonHandler(event){
-    
+function headerButtonHandler(event) {
+
     pageContentEl.remove();
     var bodyEl = document.querySelector("body");
     var scoresPageContentEl = document.createElement("div");
@@ -334,26 +338,26 @@ function headerButtonHandler(event){
     scoresPageContentEl.appendChild(scoreTitle);
     scoresPageContentEl.appendChild(scoreList);
 
-    if(currentScores === null){
+    if (currentScores === null) {
         console.log("There are no scores yet");
     }
-    else{
-        for( i = 0; i < currentScores.length; i++){
+    else {
+        for (i = 0; i < currentScores.length; i++) {
             var scoreEl = document.createElement("li")
             scoreEl.textContent = score.name + " : " + score.percentage;
         }
         scoreList.appendChild(scoreEl);
     }
 
-    
 
-    
 
-    
+
+
+
 };
 
-pageContentEl.addEventListener("click",quizButtonHandler);
-headerButtonEl.addEventListener("click",headerButtonHandler);
+pageContentEl.addEventListener("click", quizButtonHandler);
+headerButtonEl.addEventListener("click", headerButtonHandler);
 console.dir(startBtnEl);
 
 
@@ -367,7 +371,7 @@ console.dir(startBtnEl);
         //display new questions
             //replace old questions text.Content
             //Repeat righ or wrog
-// Finish quiz 
+// Finish quiz
     //show final score
         // timer and q's right
 //Choose to view HighScores
