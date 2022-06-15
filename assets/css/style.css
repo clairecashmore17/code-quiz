@@ -60,6 +60,19 @@ header {
     list-style: none;
     margin: 5px;
 }
+.questions-list {
+    display: flex;
+    flex-direction: column;
+}
+.question-order-1 {
+    order: 1;
+}
+.question-order-2 {
+    order: 2;
+}
+.question-order-3 {
+    order: 3;
+}
 .result {
     font-size: small;
     color: rgba(0,0,0, 0.2);

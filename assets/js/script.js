@@ -5,7 +5,8 @@ var quizIdCounter = 0;
 var rightAnsInd = 0;
 var wrongAnsIndex = 0;
 var finish = false;
-
+var scores = [];
+var currentScores = localStorage.getItem("score");
 
 // Variable for the event listener in main
 var pageContentEl = document.querySelector("#page-content");
@@ -16,14 +17,16 @@ var startBtnEl = window.document.querySelector("#start-quiz");
 var headerButtonEl = document.querySelector("#scoreBtn");
 var resultSectionEl = document.querySelector("#result-section");
 var resultTextEl = document.querySelector("#result-text");
-
+var questionEl = document.querySelector("#prompt");
 
 var quizQuestionsEl = document.querySelector("#questions-list");
 //object to store into localStorage at the end of each quiz
 var scoreObj = {
     timeFunct : 0,
     percentage: 0,
-    time : 0
+    time : 0,
+    name: ""
+    
 };
 var questionObj = {
     questions: [
@@ -68,21 +71,37 @@ var randomNumber = function(min, max) {
 
 // function to create multiple choice buttons
 function createMutlipleButtons(index, array,rightOrWrong){
+    var parentUlEl = document.querySelector("ul");
     var listChoiceEl = document.createElement("li");
     var listButtonEl = document.createElement("button");
-  
+    var randomIteration = randomNumber(0,4);
     listButtonEl.textContent = array[index]; 
     listButtonEl.className = "btn";
     listChoiceEl.className = "question";
     if(rightOrWrong){
-    listButtonEl.id = "question-right";
+        listButtonEl.id = "question-right";
+        console.log("randomd answer is at index " + randomIteration);
+        //Randomly alter flex order.
+        if (randomIteration == 1){
+            listChoiceEl.className = "question question-order-1";
+        }
+        else if(randomIteration == 2){
+            listChoiceEl.className = "question question-order-1";
+           
+        }
+        else if(randomIteration == 3){
+            listChoiceEl.className = "question question-order-3";
+        }
+        
+        console.dir(listButtonEl);    
     }
     else if(!rightOrWrong){
         listButtonEl.id = "question-wrong";
+        listChoiceEl.className = "question question-order-2";
         listButtonEl.setAttribute("ans-id",answerIdCounter);
         answerIdCounter++;
     }
- 
+    
     listChoiceEl.appendChild(listButtonEl);
     quizQuestionsEl.appendChild(listChoiceEl);
     
@@ -90,13 +109,14 @@ function createMutlipleButtons(index, array,rightOrWrong){
 }
 function replaceAnswers(index, array,rightOrWrong,buttonId){
 
-    
     if(rightOrWrong){
        
         var listButtonEl = document.querySelector("#question-right");
         listButtonEl.textContent = array[index]; 
-        
+      
     }
+        
+
     else if (!rightOrWrong){
         
         var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
@@ -109,7 +129,7 @@ function replaceAnswers(index, array,rightOrWrong,buttonId){
 function createNewQuestion(index) {
 
     //Change questions
-  var questionEl = document.querySelector("#prompt");
+ 
   //replace the content of the question with the next prompt in the array of questionObj
   questionEl.textContent = questionObj.questions[index];
   //Create individual Id's for reach question
@@ -188,6 +208,7 @@ function quizButtonHandler(event){
 
             console.log("have clicked a right answer");
             
+            // ********NEED TO ADD PAUSE HERE**********/
         
             //Next Question
             createNewQuestion(rightAnsInd);
@@ -243,32 +264,91 @@ function quizButtonHandler(event){
             removeAnswers(wrongAnsIndex, wrong,i);           
         }
         var finalScoreEl = document.createElement("h2");
+        
+        
+
         var questionSectionEl = document.querySelector(".quiz-questions-wrapper");
         finalScoreEl.className = "finalScore";
         finalScoreEl.textContent = "You answered " + scoreObj.percentage + "/" +questionObj.questions.length + " correctly.";
+        //Ask for users initials
+        createSubmitName(questionSectionEl);
+        
         questionSectionEl.appendChild(finalScoreEl);
     }
+};
+//Function to create the submit button for name
+function createSubmitName(parentNode) {
+    var nameInput = document.createElement( "input");
+    var nameSubmit = document.createElement("input");
+    nameInput.setAttribute('type', 'text');
+    nameInput.id = "name";
+    nameInput.placeholder = "Enter your initials";
+    nameSubmit.setAttribute('type', 'submit');
+
+    nameSubmit.addEventListener("click", saveName);
+
+    parentNode.appendChild(nameInput);
+    parentNode.appendChild(nameSubmit);
+}
+//After submit button has been pressed, save name
+function saveName() {
+    var inputVal = document.getElementById("name").value;
+    scoreObj.name = inputVal;
+    
+}
+
+//Function to save score to localStorage
+function saveScore() { 
+    //Score array score
+    //scoreobj with a name. time. and percentage
+    //store the scoreobj into a new array each time.
+    
+   
+    
+    // if(currentScores === null){
+    //     window.alert("You are the first to score!");
+            localStorage.setItem("score", JSON.stringify(scores[0]=scoreObj)); 
+    // }
+    // else {
+    //     var currentHighScore = currentScores[0];
+    //     var listLength = currentScores.length;
+    //     console.log(listLength);
+    // }
+   
 };
 
 //function to deal with buttons in header
 function headerButtonHandler(event){
-    alert("high score button clicked");
-};
-function saveScore() { 
-    var highScoreLocal = localStorage.getItem("score");
-    if(highScoreLocal < scoreObj.percentage){
-        localStorage.setItem("score", (scoreObj.percentage));
-        localStorage.setItem("time", scoreObj.time);
-        window.alert("You beat the highscore!");
+    
+    pageContentEl.remove();
+    var bodyEl = document.querySelector("body");
+    var scoresPageContentEl = document.createElement("div");
+    scoresPageContentEl.className = "page-content";
+    var scoreTitle = document.createElement("h2");
+    scoreTitle.className = "prompt";
+    scoreTitle.textContent = "Highscores: ";
+    var scoreList = document.createElement("ul");
+    scoreList.className = "scoreList";
+
+    bodyEl.appendChild(scoresPageContentEl);
+    scoresPageContentEl.appendChild(scoreTitle);
+    scoresPageContentEl.appendChild(scoreList);
+
+    if(currentScores === null){
+        console.log("There are no scores yet");
     }
-    else if(highScoreLocal == 0){
-        localStorage.setItem("score", (scoreObj.percentage));
-        localStorage.setItem("time", scoreObj.time);
-        
+    else{
+        for( i = 0; i < currentScores.length; i++){
+            var scoreEl = document.createElement("li")
+            scoreEl.textContent = score.name + " : " + score.percentage;
+        }
+        scoreList.appendChild(scoreEl);
     }
-    else {
-        window.alert("You did not beat the high score!");
-    }
+
+    
+
+    
+
     
 };
 
@@ -290,3 +370,5 @@ console.dir(startBtnEl);
 // Finish quiz 
     //show final score
         // timer and q's right
+//Choose to view HighScores
+    // display local storage highscores.
