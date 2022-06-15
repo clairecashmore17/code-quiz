@@ -53,7 +53,7 @@ header {
    font-size: larger;
 }
 .quiz-questions-wrapper {
-    font-size: small;
+    font-size: medium;
 }
 .question {
     text-align: left;
@@ -74,7 +74,7 @@ header {
     order: 3;
 }
 .result {
-    font-size: small;
+    font-size: medium;
     color: rgba(0,0,0, 0.2);
 }
 
