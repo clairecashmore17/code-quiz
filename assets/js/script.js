@@ -202,7 +202,7 @@ function quizButtonHandler(event) {
     var wrong = false;
 
     // continue until we have finished the quiz
-    if (!finish || scoreObj.time > 0) {
+    if (!finish) {
         // if our click matches the start button...
         if (targetEl.matches("#start-quiz")) {
 
