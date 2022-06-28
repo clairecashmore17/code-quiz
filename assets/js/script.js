@@ -2,10 +2,10 @@
 //Counter to distinguish which quiz questions we are on.
 var answerIdCounter = 0;
 var quizIdCounter = 0;
-
+var questionIdCounter = 0;
 //These help with progressing through our arrays of answers
-var rightAnsInd = 0;
-var wrongAnsIndex = 0;
+
+
 
 // To determine if we have completed the quiz to stop creating buttons
 var finish = false;
@@ -25,7 +25,7 @@ var resultTextEl = document.querySelector("#result-text");
 var questionEl = document.querySelector("#prompt");
 var quizQuestionsEl = document.querySelector("#questions-list");
 
-//Object in which our information is stored while playing
+// Object in which our information is stored while playing
 var scoreObj = {
     timeFunct: 0,
     percentage: 0,
@@ -69,6 +69,53 @@ var questionObj = {
         "function.open"
     ]
 };
+var questionsX = [
+    question1 = {
+        prompt: "What HTML element do we put javascript into?",
+        correct:  "<script>",
+        wrong : [
+            "<javascript>",
+        "<js>",
+        "<scripting>"
+        ]
+    },
+    question2 = {
+        prompt: "What is the correct JavaScript syntax to write 'Hello World'?",
+        correct:  "document.write('Hello World')",
+        wrong : [
+            "'Hello World'",
+            "response.write('Hello World')",
+            "write.('helloWorld)"
+        ]
+    },
+    question3 = {
+        prompt: "Where is the correct place to insert a JavaScript?",
+        correct: "Both the <head> section and the <body> section are correct",
+        wrong : [
+            "the <head> section",
+        "the <body> section",
+        "anywhere?"
+        ]
+    },
+    question4 = {
+        prompt: "How do you create a function?",
+        correct:  "function functionName() or var functioName = function()",
+        wrong : [
+            "function functionName()",
+            "function = functionName();",
+            "create.functionElement;"
+        ]
+    },
+    question5 = {
+        prompt:  "How do you call a function?",
+        correct:  "functionName(parameter);",
+        wrong : [
+            "call function",
+        "function.invoke",
+        "function.open"
+        ]
+    }
+]
 
 // function to generate a random numeric value
 var randomNumber = function (min, max) {
@@ -78,31 +125,21 @@ var randomNumber = function (min, max) {
 };
 
 // function to create multiple choice buttons
-function createMutlipleButtons(index, array, rightOrWrong) {
+function createMutlipleButtons( q, rightOrWrong) {
     var parentUlEl = document.querySelector("ul");
     var listChoiceEl = document.createElement("li");
     var listButtonEl = document.createElement("button");
     var randomIteration = randomNumber(0, 4);
-    listButtonEl.textContent = array[index];
+    console.log("This is the answer we should be placing: " + q);
     listButtonEl.className = "btn";
     listChoiceEl.className = "question";
     //If the choice we want to create is the right answer, do this
     if (rightOrWrong) {
         //create a unique ID to identify when we press it later
         listButtonEl.id = "question-right";
+        listButtonEl.textContent = q;
         
-        //THIS IS NOT IN FULL FUNCTIONALITY YET I would have to work on implementing this later
-        //Randomly alter flex order.
-        if (randomIteration == 1) {
-            listChoiceEl.className = "question question-order-1";
-        }
-        else if (randomIteration == 2) {
-            listChoiceEl.className = "question question-order-2";
-
-        }
-        else if (randomIteration == 3) {
-            listChoiceEl.className = "question question-order-3";
-        }
+      
     }
     //If we are creating the wrong answers, do this
     else if (!rightOrWrong) {
@@ -112,31 +149,32 @@ function createMutlipleButtons(index, array, rightOrWrong) {
         listChoiceEl.className = "question question-order-2";
         //Create a specific ans-id so that we can identify which wrong answer is which
         listButtonEl.setAttribute("ans-id", answerIdCounter);
+        listButtonEl.textContent = q;
         //This counter helps us only print out the 3 wrong quetsions we are pulling from our quetsion object
         answerIdCounter++;
     }
     //Append our buttons to the parent elements
     listChoiceEl.appendChild(listButtonEl);
     quizQuestionsEl.appendChild(listChoiceEl);
-
+    
 
 }
 
 //Function that replaces the answers we have already created(See createMultipleButtons())
-function replaceAnswers(index, array, rightOrWrong, buttonId) {
+function replaceAnswers(q, rightOrWrong, buttonId) {
     //If the choice we want to alter is the right answer, do this
     if (rightOrWrong) {
         //create an element that accesses the right answer button content
         var listButtonEl = document.querySelector("#question-right");
         //replace it's text content with the next right answer string from object
-        listButtonEl.textContent = array[index];
+        listButtonEl.textContent = q;
     }
     //If the choice we want to alter is a wrong answer, do this
     else if (!rightOrWrong) {
         //create an element that accesses the wrong answer button content witht the specified id created earlier
         var listButtonEl = document.querySelector(".btn[ans-id='" + buttonId + "']");
         //replace it's text content with the next wrong answer string from object
-        listButtonEl.textContent = array[index];
+        listButtonEl.textContent = q;
     }
 
 }
@@ -144,7 +182,8 @@ function replaceAnswers(index, array, rightOrWrong, buttonId) {
 function createNewQuestion(index) {
 
     //replace the content of the question with the next prompt in the array of questionObj
-    questionEl.textContent = questionObj.questions[index];
+    console.log(questionsX[questionIdCounter].prompt)
+    questionEl.textContent = questionsX[questionIdCounter].prompt;
     //Create individual Id's for reach question
     questionEl.setAttribute("question-id", quizIdCounter);
 
@@ -152,7 +191,7 @@ function createNewQuestion(index) {
 }
 
 //Function to remove the answer elements on the page
-function removeAnswers(index, rightOrWrong, buttonId) {
+function removeAnswers(rightOrWrong, buttonId) {
     //remove the right answer button
     if (rightOrWrong) {
 
@@ -215,13 +254,16 @@ function quizButtonHandler(event) {
             //remove start button
             startBtnEl.remove();
             //create new question and choices
-            createNewQuestion(rightAnsInd);
-            createMutlipleButtons(rightAnsInd, questionObj.correctAns, right);
-            rightAnsInd++;
+            createNewQuestion( );
+            createMutlipleButtons( questionsX[questionIdCounter].correct, right);
+             
             //use a for loop to create 3 wrong answers
-            for (wrongAnsIndex; wrongAnsIndex < questionObj.questions.length - 2; wrongAnsIndex++) {
-                createMutlipleButtons(wrongAnsIndex, questionObj.wrongAns, wrong);
+            console.log(questionsX[questionIdCounter].wrong)
+            for (var i = 0; i < 3; i++) {
+                console.log(questionsX[questionIdCounter].wrong[i])
+                createMutlipleButtons( questionsX[questionIdCounter].wrong[i], wrong);
             }
+            questionIdCounter++;
         }
         //Checks right answer input
         else if (targetEl.matches("#question-right")) {
@@ -236,19 +278,21 @@ function quizButtonHandler(event) {
 
 
             //Next Question replacement
-            createNewQuestion(rightAnsInd);
-            replaceAnswers(rightAnsInd, questionObj.correctAns, right);
-            rightAnsInd++;
-            var newLimit = wrongAnsIndex + 3;
+            createNewQuestion( );
+            replaceAnswers(questionsX[questionIdCounter].correct, right);
+            
+            
             var buttonId = 0;
             //for loop in order to create the next set of wrong answers
-            for (wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
-
-                replaceAnswers(wrongAnsIndex, questionObj.wrongAns, wrong, buttonId);
+            console.log(questionsX[questionIdCounter].wrong)
+            for (var i=0; i < 3; i++) {
+                console.log(questionsX[questionIdCounter].wrong[i])
+                replaceAnswers( questionsX[questionIdCounter].wrong[i], wrong, buttonId);
 
                 buttonId++;
             }
             checkEnd(targetEl);
+            questionIdCounter++;
 
         }
         //evaluate if the answer clicked was wrong
@@ -262,18 +306,20 @@ function quizButtonHandler(event) {
 
            
             //Next Question replacement
-            createNewQuestion(rightAnsInd);
-            replaceAnswers(rightAnsInd, questionObj.correctAns, right);
-            rightAnsInd++;
-            var newLimit = wrongAnsIndex + 3;
+            createNewQuestion( );
+            
+            replaceAnswers(questionsX[questionIdCounter].correct, right);
+            
+            
             var buttonId = 0;
             //for loop in order to create the next set of wrong answers
             for (wrongAnsIndex; wrongAnsIndex < newLimit; wrongAnsIndex++) {
-                replaceAnswers(wrongAnsIndex, questionObj.wrongAns, wrong, buttonId);
-                console.log(questionObj.wrongAns[wrongAnsIndex]);
+                replaceAnswers(questionsX[questionIdCounter].wrong[i], wrong, buttonId);
+                console.log(questionsX[questionIdCounter].wrong[i]);
                 buttonId++;
             }
             checkEnd(targetEl);
+            questionIdCounter++;
         }
     }
     else {
@@ -286,10 +332,10 @@ function quizButtonHandler(event) {
         //remove the result section
         resultSectionEl.remove();
         //remove all of our answers on the page
-        removeAnswers(rightAnsInd, right);
+        removeAnswers(right);
         for (i = 0; i < 3; i++) {
 
-            removeAnswers(wrongAnsIndex, wrong, i);
+            removeAnswers( wrong, i);
         }
         //create an element to showcase the users score
         var finalScoreEl = document.createElement("h2");
@@ -413,3 +459,50 @@ headerButtonEl.addEventListener("click", headerButtonHandler);
         // timer and q's right
 //Choose to view HighScores
     // display local storage highscores.
+
+
+    //Click Start
+    //Question pops up
+        //what was submitted
+        //Determine right or wrong
+        //total up
+        // for( i =0 ; i < questionarr.length-1; i++){
+        //replace answers until end of array
+            //replace textcontent
+            //evaluate right or wrong
+            // add to score
+        //}
+    //Report final score
+
+//     var questionarr = [
+//         question1 = {
+//             prompt: "question 1",
+//             right: "right answ",
+//             wrong: ["wrong answers", "wrong asnwer 2", "wrong answ 3"]
+//         },
+//         question2 = {
+//             prompt: "question 2",
+//             right: "right answ",
+//             wrong: ["wrong answers", "wrong asnwer 2", "wrong answ 3"]
+//         },
+//         question3 = {
+//             prompt: "question 3",
+//             right: "right answ",
+//             wrong: ["wrong answers", "wrong asnwer 2", "wrong answ 3"]
+//         },
+//     ]
+
+// var questionCounter = 0;
+
+//questionArr[0].prompt = "question 1"
+//questionarr[1].prompt = "question 2"
+
+
+// // correct answer
+// questionCounter++;
+// questionarr[questionCounter];
+// //wrong answer
+// questionCounter++;
+//     promptEl.textContent = questionarr[questionCoutner].prompt;
+
+    
